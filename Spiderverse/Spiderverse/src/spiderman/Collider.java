@@ -36,81 +36,19 @@ import java.util.*;
 
 public class Collider {
 
-    public static void main(String[] args) {
 
-        if ( args.length < 3 ) {
-            StdOut.println(
-                "Execute: java -cp bin spiderman.Collider <dimension INput file> <spiderverse INput file> <collider OUTput file>");
-                return;
-        }
+    public LinkedList<Integer>[] adjList; 
 
-        StdIn.setFile(args[0]);
-        int numOfDimensions = StdIn.readInt(); 
-        int hashtableSize = StdIn.readInt(); 
-        int rehashThreshold = StdIn.readInt(); 
-        StdIn.readLine();
-        LinkedList<Integer>[] clusters = (LinkedList<Integer>[]) new LinkedList<?>[hashtableSize];
+    public Collider (Clusters clusters)
+    {
         ArrayList<Integer> discreteDimensions = new ArrayList<Integer>();
-        int dimensionCounter = 0; 
-        while(dimensionCounter < numOfDimensions) 
-        {
-            int dimension = StdIn.readInt();
-            int key = dimension % clusters.length;
-            if (clusters[key] == null)
-            {
-                LinkedList<Integer> newList = new LinkedList<Integer>();
-                newList.addFirst(dimension);
-                clusters[key] = newList; 
-            }
-            else
-            {
-                clusters[key].addFirst(dimension); 
-            }
-            dimensionCounter++;
-            if (dimensionCounter/clusters.length>= rehashThreshold)
-            {
-                clusters = rehash(clusters, dimensionCounter);
-            }
-            StdIn.readLine();
-        }
-
-        for (int i = 0; i<clusters.length; i++)
-        {
-            if (i == 0)
-            {
-                clusters[i].addLast(clusters[clusters.length-1].getFirst());
-                clusters[i].addLast(clusters[clusters.length-2].getFirst());
-
-            }
-            else if (i == 1)
-            {
-                clusters[i].addLast(clusters[0].getFirst());
-                clusters[i].addLast(clusters[clusters.length-1].getFirst());
-            }
-            else
-            {
-                clusters[i].addLast(clusters[i-1].getFirst());
-                clusters[i].addLast(clusters[i-2].getFirst());
-            }
-        }
-
-        StdOut.setFile(args[2]);
-        /*for(int i = 0; i<clusters.length; i++)
-        {
-            LinkedList<Integer> currentRow = clusters[i];
-            for (int k = 0; k<currentRow.size(); k++)
-            {
-                StdOut.print(currentRow.get(k) + " ");
-            }
-            StdOut.println();
-        }*/
+        int numOfDimensions = clusters.getDimensionNumber();
         
-
-        LinkedList<Integer>[] adjList = (LinkedList<Integer>[]) new LinkedList<?>[numOfDimensions];
+        adjList = (LinkedList<Integer>[]) new LinkedList<?>[numOfDimensions];
         int adjListCounter=0;
-        for (int i = 0; i<clusters.length; i++)
+        for (int i = 0; i<clusters.getClustersSize(); i++)
         {
-            LinkedList<Integer> traversal = clusters[i];
+            LinkedList<Integer> traversal = clusters.getClusterRow(i);
             for (int k = 0; k<traversal.size(); k++)
             {
                if(adjListCounter<adjList.length)
@@ -130,13 +68,13 @@ public class Collider {
 
         for (int i = 0; i<adjList.length; i++)
         {
-            for (int k = 0; k<clusters.length; k++)
+            for (int k = 0; k<clusters.getClustersSize(); k++)
             {
-                if(clusters[k].getFirst() == adjList[i].getFirst())
+                if(clusters.getClusterRow(k).getFirst() == adjList[i].getFirst())
                 {
-                    for(int y = 1; y<clusters[k].size(); y++)
+                    for(int y = 1; y<clusters.getClusterRow(k).size(); y++)
                     {
-                        adjList[i].add(clusters[k].get(y)); 
+                        adjList[i].add(clusters.getClusterRow(k).get(y)); 
                     }
                 }
             }
@@ -160,53 +98,39 @@ public class Collider {
             }
         }
 
+    }
+
+    public int getColliderSize()
+    {
+        return adjList.length;
+    }
+
+    public LinkedList<Integer> getColliderRow(int index)
+    {
+        return adjList[index];
+    }
+
+    public static void main(String[] args) {
+
+        if ( args.length < 3 ) {
+            StdOut.println(
+                "Execute: java -cp bin spiderman.Collider <dimension INput file> <spiderverse INput file> <collider OUTput file>");
+                return;
+        }
+
+        Clusters clusters = new Clusters(args[0]);
+        Collider adjList = new Collider(clusters);
 
 
-
-
-
-
-        for(int i  = 0; i<adjList.length; i++)
+        for(int i  = 0; i<adjList.getColliderSize(); i++)
         {
-            StdOut.println(adjList[i]);
+            StdOut.println(adjList.getColliderRow(i));
         }
         
 
     }
 
-   
-    private static LinkedList<Integer>[] rehash (LinkedList<Integer>[] curr, int numOfDimensions)
-    {
-        int size = curr.length; 
-        ArrayList<Integer> transfer = new ArrayList<Integer>();
-        LinkedList<Integer>[] rehashedTable = (LinkedList<Integer>[]) new LinkedList<?>[size*2]; 
-        for (int i = 0; i<size; i++)
-        {
-            LinkedList<Integer> temp = curr[i];
-            for (int k = 0; k<temp.size(); k++)
-            {
-                transfer.add(temp.get(k));
-            }
-        }
-        for (int i = 0; i < transfer.size(); i++)
-        {
-            int key = transfer.get(i) % rehashedTable.length;
-            if (rehashedTable[key] == null)
-            {
-                LinkedList<Integer> newList = new LinkedList<Integer>();
-                newList.addFirst(transfer.get(i));
-                rehashedTable[key] = newList; 
-                
-            }
-            else
-            {
-                rehashedTable[key].addFirst(transfer.get(i)); 
-    
-            }
-        }
-        return rehashedTable; 
 
-    } 
         
 }
 

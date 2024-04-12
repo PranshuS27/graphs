@@ -25,28 +25,16 @@ import java.util.*;
 public class Clusters {
 
     public LinkedList<Integer>[] clusters; 
+    public int numOfDimensions;
 
-    public void setClusters (String filename)
+    public Clusters (String filename)
     {
         StdIn.setFile(filename);
-        
-
-    }
-    public static void main(String[] args) {
-
-        if ( args.length < 2 ) {
-            StdOut.println(
-                "Execute: java -cp bin spiderman.Clusters <dimension INput file> <collider OUTput file>");
-                return;
-        }
-
-        StdIn.setFile(args[0]);
-        StdOut.setFile(args[1]);
         int numOfDimensions = StdIn.readInt(); 
         int hashtableSize = StdIn.readInt(); 
         int rehashThreshold = StdIn.readInt(); 
         StdIn.readLine();
-        LinkedList<Integer>[] clusters = (LinkedList<Integer>[]) new LinkedList<?>[hashtableSize];
+        clusters = (LinkedList<Integer>[]) new LinkedList<?>[hashtableSize];
         int dimensionCounter = 0; 
         while(dimensionCounter < numOfDimensions) 
         {
@@ -70,6 +58,8 @@ public class Clusters {
             StdIn.readLine();
         }
 
+        numOfDimensions = dimensionCounter; 
+
         for (int i = 0; i<clusters.length; i++)
         {
             if (i == 0)
@@ -91,16 +81,48 @@ public class Clusters {
         }
 
 
+    }
 
-        for(int i = 0; i<clusters.length; i++)
+    public int getDimensionNumber()
+    {
+        return numOfDimensions; 
+    }
+
+    public int getClustersSize()
+    {
+        return clusters.length; 
+    }
+
+    public LinkedList<Integer> getClusterRow(int index)
+    {
+        return clusters[index];
+    }
+
+    
+    
+    public static void main(String[] args) {
+
+        if ( args.length < 2 ) {
+            StdOut.println(
+                "Execute: java -cp bin spiderman.Clusters <dimension INput file> <collider OUTput file>");
+                return;
+        }
+
+        Clusters newClusters = new Clusters(args[0]);
+        StdOut.setFile(args[1]);
+        
+        for(int i = 0; i<newClusters.getClustersSize(); i++)
         {
-            LinkedList<Integer> currentRow = clusters[i];
+            LinkedList<Integer> currentRow = newClusters.getClusterRow(i);
             for (int k = 0; k<currentRow.size(); k++)
             {
                 StdOut.print(currentRow.get(k) + " ");
             }
             StdOut.println();
         }
+
+
+
 
 
     }
