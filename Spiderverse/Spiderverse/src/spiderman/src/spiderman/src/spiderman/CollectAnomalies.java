@@ -3,19 +3,19 @@ import java.util.*;
 
 /**
  * Steps to implement this class main method:
- * 
+ *
  * Step 1:
  * DimensionInputFile name is passed through the command line as args[0]
  * Read from the DimensionsInputFile with the format:
  * 1. The first line with three numbers:
  *      i.    a (int): number of dimensions in the graph
  *      ii.   b (int): the initial size of the cluster table prior to rehashing
- *      iii.  c (double): the capacity(threshold) used to rehash the cluster table 
+ *      iii.  c (double): the capacity(threshold) used to rehash the cluster table
  * 2. a lines, each with:
  *      i.    The dimension number (int)
  *      ii.   The number of canon events for the dimension (int)
  *      iii.  The dimension weight (int)
- * 
+ *
  * Step 2:
  * SpiderverseInputFile name is passed through the command line as args[1]
  * Read from the SpiderverseInputFile with the format:
@@ -24,60 +24,60 @@ import java.util.*;
  *      i.    The dimension they are currently at (int)
  *      ii.   The name of the person (String)
  *      iii.  The dimensional signature of the person (int)
- * 
+ *
  * Step 3:
  * HubInputFile name is passed through the command line as args[2]
  * Read from the HubInputFile with the format:
  * One integer
  *      i.    The dimensional number of the startNodeing hub (int)
- * 
+ *
  * Step 4:
  * CollectedOutputFile name is passed in through the command line as args[3]
  * Output to CollectedOutputFile with the format:
  * 1. e Lines, listing the Name of the anomaly collected with the Spider who
- *    is at the same Dimension (if one exists, space separated) followed by 
+ *    is at the same Dimension (if one exists, space separated) followed by
  *    the Dimension number for each Dimension in the route (space separated)
- * 
+ *
  * @author Seth Kelley
  */
 
 public class CollectAnomalies {
-    
-    HashMap<Integer, Integer> oldToNew; 
-    HashMap<Integer, Integer> newToOld; 
-    LinkedList<Integer>[] normalizedAdjList; 
+
+    HashMap<Integer, Integer> oldToNew;
+    HashMap<Integer, Integer> newToOld;
+    LinkedList<Integer>[] normalizedAdjList;
 
     public CollectAnomalies (LinkedList<Integer>[] adjList)
     {
-        oldToNew = new HashMap<Integer, Integer>(); 
-        newToOld = new HashMap<Integer, Integer>(); 
+        oldToNew = new HashMap<Integer, Integer>();
+        newToOld = new HashMap<Integer, Integer>();
         for (int i = 0; i<adjList.length; i++)
         {
-            int curr = adjList[i].getFirst(); 
-            oldToNew.put(curr, i); 
-            newToOld.put(i,curr); 
+            int curr = adjList[i].getFirst();
+            oldToNew.put(curr, i);
+            newToOld.put(i,curr);
         }
         normalizedAdjList = (LinkedList<Integer>[]) new LinkedList<?>[adjList.length];
         for(int i = 0; i<adjList.length; i++)
         {
-            LinkedList<Integer> temp = adjList[i]; 
-            normalizedAdjList[i] = new LinkedList<Integer>(); 
+            LinkedList<Integer> temp = adjList[i];
+            normalizedAdjList[i] = new LinkedList<Integer>();
             for(int k = 0; k<temp.size(); k++)
             {
                 normalizedAdjList[i].add(oldToNew.get(temp.get(k)));
             }
-        } 
+        }
 
     }
 
     public LinkedList<Integer> getNormalizedAdjListRow(int index)
     {
-        return normalizedAdjList[index]; 
+        return normalizedAdjList[index];
     }
 
     public int getNormalizedAdjListLength()
     {
-        return normalizedAdjList.length; 
+        return normalizedAdjList.length;
     }
 
     public static LinkedList<Integer>[] makeAdjList(Clusters clusters)
@@ -91,17 +91,17 @@ public class CollectAnomalies {
             LinkedList<Integer> traversal = clusters.getClusterRow(i);
             for (int k = 0; k<traversal.size(); k++)
             {
-               if(adjListCounter<adjList.length)
-               {
+                if(adjListCounter<adjList.length)
+                {
                     if(!discreteDimensions.contains(traversal.get(k)))
                     {
                         LinkedList<Integer> temp = new LinkedList<Integer>();
-                        adjList[adjListCounter] = temp;  
+                        adjList[adjListCounter] = temp;
                         adjList[adjListCounter].addFirst(traversal.get(k));
                         discreteDimensions.add(traversal.get(k));
                         adjListCounter++;
                     }
-               }
+                }
             }
 
         }
@@ -114,7 +114,7 @@ public class CollectAnomalies {
                 {
                     for(int y = 1; y<clusters.getClusterRow(k).size(); y++)
                     {
-                        adjList[i].add(clusters.getClusterRow(k).get(y)); 
+                        adjList[i].add(clusters.getClusterRow(k).get(y));
                     }
                 }
             }
@@ -126,7 +126,7 @@ public class CollectAnomalies {
             LinkedList<Integer> temp = adjList[i];
             for (int k = 1; k<temp.size(); k++)
             {
-                int target = temp.get(k);   
+                int target = temp.get(k);
                 for (int j = 0; j<adjList.length; j++)
                 {
                     if (target == adjList[j].getFirst() && !adjList[j].contains(temp.getFirst()))
@@ -137,31 +137,31 @@ public class CollectAnomalies {
 
             }
         }
-        return adjList; 
+        return adjList;
     }
 
     public static ArrayList<dimensionNode> dimensions(String inputFile)
     {
-        ArrayList<dimensionNode> dimensions = new ArrayList<dimensionNode>(); 
+        ArrayList<dimensionNode> dimensions = new ArrayList<dimensionNode>();
         StdIn.setFile(inputFile);
         int numOfPeople = StdIn.readInt();
-        StdIn.readLine(); 
+        StdIn.readLine();
         for(int i = 0; i<numOfPeople; i++)
         {
             int curr = StdIn.readInt();
-            String name = StdIn.readString(); 
-            int home = StdIn.readInt(); 
+            String name = StdIn.readString();
+            int home = StdIn.readInt();
             dimensionNode node = new dimensionNode(curr, name, home);
             dimensions.add(i, node);
-            StdIn.readLine(); 
+            StdIn.readLine();
         }
-        return dimensions; 
+        return dimensions;
     }
 
 
     public List<Integer> bfs(int startNode, int lastNode)
     {
-        
+
 
         LinkedList<List<Integer>> queue = new LinkedList<>();
         List<Integer> firstPath = new LinkedList<>();
@@ -171,7 +171,7 @@ public class CollectAnomalies {
         while (!queue.isEmpty()) {
             List<Integer> path = queue.pollFirst();
             int node = path.get(path.size() - 1);
-            if (node ==  (lastNode)) 
+            if (node ==  (lastNode))
             {
                 return path;
             }
@@ -183,14 +183,14 @@ public class CollectAnomalies {
             }
         }
 
-    
+
 
         return null;
     }
 
 
 
-    
+
 
 
 
@@ -198,19 +198,19 @@ public class CollectAnomalies {
 
         if ( args.length < 4 ) {
             StdOut.println(
-                "Execute: java -cp bin spiderman.CollectAnomalies <dimension INput file> <spiderverse INput file> <hub INput file> <collected OUTput file>");
-                return;
+                    "Execute: java -cp bin spiderman.CollectAnomalies <dimension INput file> <spiderverse INput file> <hub INput file> <collected OUTput file>");
+            return;
         }
 
-        StdOut.setFile(args[3]); 
+        StdOut.setFile(args[3]);
         Clusters clusters = new Clusters(args[0]);
         LinkedList<Integer>[] list = makeAdjList(clusters);
-        CollectAnomalies ca = new CollectAnomalies(list); 
-        ArrayList<dimensionNode> dimensions = dimensions(args[1]); 
+        CollectAnomalies ca = new CollectAnomalies(list);
+        ArrayList<dimensionNode> dimensions = dimensions(args[1]);
         int first = ca.oldToNew.get(928);
         for (int i = 0; i<dimensions.size(); i++)
         {
-            boolean hasSpider = false; 
+            boolean hasSpider = false;
             String spiderName = "";
             int dimensionsCheck = dimensions.get(i).getCurrent();
             String name = dimensions.get(i).getName();
@@ -222,15 +222,15 @@ public class CollectAnomalies {
                     {
                         if(hasSpider==false)
                         {
-                            hasSpider=true; 
+                            hasSpider=true;
                             spiderName = dimensions.get(k).getName();
                         }
-                    
+
                     }
                 }
                 if(hasSpider && dimensions.get(i).getCurrent() != dimensions.get(i).getCorrect())
                 {
-                    StdOut.print(name + " " + spiderName + " "); 
+                    StdOut.print(name + " " + spiderName + " ");
                     List<Integer> path = ca.bfs(ca.oldToNew.get(dimensionsCheck), first);
                     for (int l = 0; l<path.size(); l++)
                     {
@@ -255,9 +255,9 @@ public class CollectAnomalies {
                 }
             }
         }
-        
+
 
         // WRITE YOUR CODE HERE
-        
+
     }
 }

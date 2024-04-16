@@ -3,7 +3,7 @@ import java.util.*;
 
 /**
  * Steps to implement this class main method:
- * 
+ *
  * Step 1:
  * DimensionInputFile name is passed through the command line as args[0]
  * Read from the DimensionsInputFile with the format:
@@ -11,32 +11,32 @@ import java.util.*;
  *      i.    a (int): number of dimensions in the graph
  *      ii.   b (int): the initial size of the cluster table prior to rehashing
  *      iii.  c (double): the capacity(threshold) used to rehash the cluster table 
- * 
+ *
  * Step 2:
  * ClusterOutputFile name is passed in through the command line as args[1]
  * Output to ClusterOutputFile with the format:
  * 1. n lines, listing all of the dimension numbers connected to 
  *    that dimension in order (space separated)
  *    n is the size of the cluster table.
- * 
+ *
  * @author Seth Kelley
  */
 
 public class Clusters {
 
-    public LinkedList<Integer>[] clusters; 
+    public LinkedList<Integer>[] clusters;
     public int numOfDimensions;
 
     public Clusters (String filename)
     {
         StdIn.setFile(filename);
-        numOfDimensions = StdIn.readInt(); 
-        int hashtableSize = StdIn.readInt(); 
-        double rehashThreshold = StdIn.readDouble(); 
+        numOfDimensions = StdIn.readInt();
+        int hashtableSize = StdIn.readInt();
+        double rehashThreshold = StdIn.readDouble();
         StdIn.readLine();
         clusters = (LinkedList<Integer>[]) new LinkedList<?>[hashtableSize];
-        int dimensionCounter = 0; 
-        while(dimensionCounter < numOfDimensions) 
+        int dimensionCounter = 0;
+        while(dimensionCounter < numOfDimensions)
         {
             int dimension = StdIn.readInt();
             int key = dimension % clusters.length;
@@ -44,11 +44,11 @@ public class Clusters {
             {
                 LinkedList<Integer> newList = new LinkedList<Integer>();
                 newList.addFirst(dimension);
-                clusters[key] = newList; 
+                clusters[key] = newList;
             }
             else
             {
-                clusters[key].addFirst(dimension); 
+                clusters[key].addFirst(dimension);
             }
             dimensionCounter++;
             if (dimensionCounter/clusters.length>= rehashThreshold)
@@ -58,7 +58,7 @@ public class Clusters {
             StdIn.readLine();
         }
 
-        numOfDimensions = dimensionCounter; 
+        numOfDimensions = dimensionCounter;
 
         for (int i = 0; i<clusters.length; i++)
         {
@@ -85,12 +85,12 @@ public class Clusters {
 
     public int getDimensionNumber()
     {
-        return numOfDimensions; 
+        return numOfDimensions;
     }
 
     public int getClustersSize()
     {
-        return clusters.length; 
+        return clusters.length;
     }
 
     public LinkedList<Integer> getClusterRow(int index)
@@ -98,19 +98,19 @@ public class Clusters {
         return clusters[index];
     }
 
-    
-    
+
+
     public static void main(String[] args) {
 
         if ( args.length < 2 ) {
             StdOut.println(
-                "Execute: java -cp bin spiderman.Clusters <dimension INput file> <collider OUTput file>");
-                return;
+                    "Execute: java -cp bin spiderman.Clusters <dimension INput file> <collider OUTput file>");
+            return;
         }
 
         Clusters newClusters = new Clusters(args[0]);
         StdOut.setFile(args[1]);
-        
+
         for(int i = 0; i<newClusters.getClustersSize(); i++)
         {
             LinkedList<Integer> currentRow = newClusters.getClusterRow(i);
@@ -127,12 +127,12 @@ public class Clusters {
 
     }
 
-   
+
     private static LinkedList<Integer>[] rehash (LinkedList<Integer>[] curr, int numOfDimensions)
     {
-        int size = curr.length; 
+        int size = curr.length;
         ArrayList<Integer> transfer = new ArrayList<Integer>();
-        LinkedList<Integer>[] rehashedTable = (LinkedList<Integer>[]) new LinkedList<?>[size*2]; 
+        LinkedList<Integer>[] rehashedTable = (LinkedList<Integer>[]) new LinkedList<?>[size*2];
         for (int i = 0; i<size; i++)
         {
             LinkedList<Integer> temp = curr[i];
@@ -148,18 +148,18 @@ public class Clusters {
             {
                 LinkedList<Integer> newList = new LinkedList<Integer>();
                 newList.addFirst(transfer.get(i));
-                rehashedTable[key] = newList; 
-                
+                rehashedTable[key] = newList;
+
             }
             else
             {
-                rehashedTable[key].addFirst(transfer.get(i)); 
-    
+                rehashedTable[key].addFirst(transfer.get(i));
+
             }
         }
-        return rehashedTable; 
+        return rehashedTable;
 
     }
 
-    
+
 }
